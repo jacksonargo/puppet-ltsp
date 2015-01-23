@@ -1,6 +1,6 @@
 {
   "name": "jackson-ltsp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Jackson",
   "summary": "A module for managing and installing ltsp server and clients",
   "license": "Apache 2.0",
@@ -8,7 +8,15 @@
   "project_page": "https://github.com/jacksonargo/puppet-ltsp",
   "issues_url": "https://github.com/jacksonargo/puppet-ltsp/issues",
   "dependencies": [
-    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+  ],
+  "operatingsystem_support": [
+    {
+    "operatingsystem": "Ubuntu",
+    "operatingsystemrelease": [
+      "14.04",
+      "12.04"
+      ]
+    }
   ]
 }
 
