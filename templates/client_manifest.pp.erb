@@ -1,0 +1,15 @@
+
+# Update apt-get
+exec { "/usr/bin/apt-get update": }
+
+# Install apt-get packages
+<% @client_packages.each do |p| -%>
+package { <%= p %> : ensure => installed }
+<% end -%>
+
+# Download virtualgl
+exec { "/usr/bin/wget -O /root/virtualgl.deb <%= @virtualgl_package_url %>" : }
+
+# Install virtualgl
+package { "virtualgl" : source => "/root/virtualgl.deb" }
+

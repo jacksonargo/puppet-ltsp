@@ -1,0 +1,17 @@
+#
+# This file is now maintained by puppet; see the webpage below for more information.
+# If you have any questions, please email me <jargo@uga.edu>
+# http://frost/pmwiki/pmwiki.php/Main/PuppetManagedFiles
+#
+
+[main] 
+    report = true
+    reports = log,store
+    vardir = /etc/puppet/var
+    logdir = /etc/puppet/var/log
+    certname = <%= @hostname %>-<%= @image %>.woods.ccrc
+
+[agent]
+    report = true
+    server = aarya.woods.ccrc
+    environment = <%= @environment %>
