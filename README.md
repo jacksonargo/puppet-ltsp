@@ -7,73 +7,80 @@
 3. [Setup - The basics of getting started with ltsp](#setup)
     * [What ltsp affects](#what-ltsp-affects)
     * [Setup requirements](#setup-requirements)
-    * [Beginning with ltsp](#beginning-with-ltsp)
 4. [Usage - Configuration options and additional functionality](#usage)
 5. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
 5. [Limitations - OS compatibility, etc.](#limitations)
-6. [Development - Guide for contributing to the module](#development)
 
 ## Overview
 
-A one-maybe-two sentence summary of what the module does/what problem it solves.
-This is your 30 second elevator pitch for your module. Consider including
-OS/Puppet version it works with.
+This module is used to configure an ltsp server and the client images.
+This has only been tested on Ubuntu.
 
 ## Module Description
 
-If applicable, this section should have a brief description of the technology
-the module integrates with and what that integration enables. This section
-should answer the questions: "What does this module *do*?" and "Why would I use
-it?"
+This module will create an ltsp image, install puppet in it, and then run puppet from within the chroot
+so you can manage the chroot like any other server. You have to give the client a particular cert name
+so that the puppet master can tell the chroot puppet agent and host puppet agent apart.
 
-If your module has a range of functionality (installation, configuration,
-management, etc.) this is the time to mention it.
+This module will also install the ltsp package and any configuration files with it.
 
 ## Setup
 
 ### What ltsp affects
 
-* A list of files, packages, services, or operations that the module will alter,
-  impact, or execute on the system it's installed on.
-* This is a great place to stick any warnings.
-* Can be in list or paragraph form.
+* Installs the ltsp packages
+* Installs/manages any server configuration files needed.
+* Installs/manages clients images in /opt/ltsp.
 
-### Setup Requirements **OPTIONAL**
+### Setup Requirements
 
-If your module requires anything extra before setting up (pluginsync enabled,
-etc.), mention it here.
-
-### Beginning with ltsp
-
-The very basic steps needed for a user to get the module up and running.
-
-If your most recent release breaks compatibility or requires particular steps
-for upgrading, you may wish to include an additional section here: Upgrading
-(For an example, see http://forge.puppetlabs.com/puppetlabs/firewall).
+* The ltsp class makes hiera lookups so you need that configured and ready.
 
 ## Usage
 
-Put the classes, types, and resources for customizing, configuring, and doing
-the fancy stuff with your module here.
+This module has 1 class:
 
-## Reference
+    class { 'ltsp' :
+        package => # The name of the package for ltsp. Can be an array.
+    }
 
-Here, list the classes, types, providers, facts, etc contained in your module.
-This section should include all of the under-the-hood workings of your module so
-people know what the module is touching on their system but don't need to mess
-with things. (We are working on automating this section!)
+This module has 1 resource type:
+
+    ltsp::image { 'resource title' :
+        image                => # The name of this image. Defaults to title.
+        image_cert           => # The cert name the image will use to connect to the pupper master.
+        image_environment    => # The puppet environment for the image. Defaults to the current environment.
+        image_puppetmater    => # The name of the puppet master. Defaults to the current puppet master.
+        image_puppetmasterip => # The puppet master's ip. Defaults to the current master's ip.
+    }
+
+The ltsp class makes the following hiera lookups:
+
+    ltsp::files:          # A hash containing any files that need to be installed on the ltsp server.
+    ltsp::file_defaults:  # A hash of defaults for the files.
+    ltsp::images:         # A hash containing all the images to install.
+    ltsp::image_defaults: # A hash of defaults for the images.
+
+Example yaml file:
+
+    ltsp::package: ltsp
+    ltsp::file_defaults:
+        owner: 0
+        group: 0
+        mode:  '644'
+    ltsp::files:
+        /etc/ltsp/dhcp.conf:
+            source: puppet:///
+    ltsp::client_defaults:
+        image_environment: production
+    ltsp::clients:
+        myimage64:
+            image_cert: myimage64.exmaple.cert
+        myimage32:
+            image_cert: myimage32.example.cert
 
 ## Limitations
 
-This is where you list OS compatibility, version compatibility, etc.
+I've only tested this with Ubuntu's ltsp, but it should also work with Debian's. I don't have much hope for OpenSuse's ltsp, but 
+feel free to try.
 
-## Development
-
-Since your module is awesome, other users will want to play with it. Let them
-know what the ground rules for contributing are.
-
-## Release Notes/Contributors/Etc **Optional**
-
-If you aren't using changelog, put your release notes here (though you should
-consider using changelog). You may also add any additional sections you feel are
-necessary or important to include here. Please use the `## ` header.

@@ -44,7 +44,13 @@ define ltsp::image (
 
     # Run puppet in the chroot
     exec { "run-puppet-$image" : 
-        command => "/usr/sbin/chroot $chroot /usr/bin/puppet apply /root/manifest.pp > /dev/null",
+        command => "/usr/sbin/chroot $chroot /usr/bin/puppet agent --test",
         timeout => 0
+    } ~>
+
+    # Update the image
+    exec { "update-$image" :
+        command => "/usr/sbin/ltsp-update-image --arch $image",
+        refreshonly => true
     }
 }
